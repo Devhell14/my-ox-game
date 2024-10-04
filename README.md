@@ -5,8 +5,8 @@
 First, clone the repository:
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/Devhell14/my-ox-game.git
+cd my-ox-game
 
 npm run dev
 # or
