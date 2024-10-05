@@ -1,5 +1,3 @@
-"use client";
-
 import { useGameStore } from "@/store/store";
 import { useEffect, useState } from "react";
 
@@ -29,6 +27,7 @@ const TicTacToe: React.FC = () => {
 
   const [isXNext, setIsXNext] = useState<boolean>(true);
   const [winnerMessage, setWinnerMessage] = useState<string>("");
+  const [oWinStreak, setOWinStreak] = useState<number>(0); // Track O's win streak
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -41,8 +40,8 @@ const TicTacToe: React.FC = () => {
   }, [countdown, winnerMessage, isDraw]);
 
   const handleClick = (index: number): void => {
+    console.log("handleClick index =>", index);
     if (board[index] || calculateWinner(board)) return;
-
     const newBoard: BoardType = [...board];
     newBoard[index] = "X";
     setBoard(newBoard);
@@ -51,11 +50,11 @@ const TicTacToe: React.FC = () => {
     if (winner) {
       if (winStreak + 1 === 3) {
         setScore(score + 2);
-        setXScore(xScore + 2); // เพิ่มคะแนนของผู้เล่น X
+        setXScore(xScore + 2);
         setWinStreak(0);
       } else {
         setScore(score + 1);
-        setXScore(xScore + 1); // เพิ่มคะแนนของผู้เล่น X
+        setXScore(xScore + 1);
         setWinStreak(winStreak + 1);
       }
       setWinnerMessage("X ชนะ + 1");
@@ -82,12 +81,19 @@ const TicTacToe: React.FC = () => {
     newBoard[botIndex] = "O";
     setBoard(newBoard);
 
-    if (calculateWinner(newBoard)) {
-      setScore(score - 1);
-      setOScore(oScore + 1); // เพิ่มคะแนนของผู้เล่น O
-      setWinStreak(0);
-      setWinnerMessage("O ชนะ - 1");
-      setOWins(oWins + 1); // Update oWins in the store
+    const winner = calculateWinner(newBoard);
+    if (winner) {
+      if (oWinStreak + 1 === 3) { // Check if O's win streak is 3
+        setScore(score + 2);
+        setOScore(oScore + 2);
+        setOWinStreak(0); // Reset O's win streak
+      } else {
+        setScore(score - 1);
+        setOScore(oScore + 1);
+        setOWinStreak(oWinStreak + 1); // Increment O's win streak
+      }
+      setWinnerMessage("O ชนะ + 1");
+      setOWins(oWins + 1);
       setCountdown(6);
     } else if (!newBoard.includes(null)) {
       setScore(score - 1);
@@ -98,6 +104,7 @@ const TicTacToe: React.FC = () => {
   };
 
   const calculateWinner = (squares: BoardType): string | null => {
+    console.log("squares =>", squares);
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -130,21 +137,17 @@ const TicTacToe: React.FC = () => {
   };
 
   const resetGame = (): void => {
-    // Reset state variables
     setBoard(Array(9).fill(null));
     setXScore(0);
     setOScore(0);
     setXWins(0);
-    setOWins(0); // Reset oWins in the store
+    setOWins(0);
     setIsXNext(true);
     setIsDraw(false);
     setWinnerMessage("");
     setCountdown(6);
-
-    // Clear local storage
     localStorage.clear();
   };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       <h1 className="text-2xl mb-4 font-bold sm:text-4xl">Tic Tac Toe</h1>
