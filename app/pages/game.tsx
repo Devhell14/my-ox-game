@@ -3,7 +3,9 @@
 import { useGameStore } from "@/store/store";
 import { useEffect, useState } from "react";
 
-const TicTacToe = () => {
+type BoardType = (string | null)[];
+
+const TicTacToe: React.FC = () => {
   const {
     board,
     score,
@@ -11,7 +13,7 @@ const TicTacToe = () => {
     oScore,
     winStreak,
     xWins,
-    oWins, 
+    oWins,
     isDraw,
     countdown,
     setBoard,
@@ -20,13 +22,13 @@ const TicTacToe = () => {
     setOScore,
     setWinStreak,
     setXWins,
-    setOWins, 
+    setOWins,
     setIsDraw,
     setCountdown,
   } = useGameStore();
 
-  const [isXNext, setIsXNext] = useState(true);
-  const [winnerMessage, setWinnerMessage] = useState("");
+  const [isXNext, setIsXNext] = useState<boolean>(true);
+  const [winnerMessage, setWinnerMessage] = useState<string>("");
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -38,10 +40,10 @@ const TicTacToe = () => {
     return () => clearTimeout(timer);
   }, [countdown, winnerMessage, isDraw]);
 
-  const handleClick = (index: number) => {
+  const handleClick = (index: number): void => {
     if (board[index] || calculateWinner(board)) return;
 
-    const newBoard = [...board];
+    const newBoard: BoardType = [...board];
     newBoard[index] = "X";
     setBoard(newBoard);
 
@@ -68,15 +70,15 @@ const TicTacToe = () => {
     }
   };
 
-  const botMove = (currentBoard: string[]) => {
+  const botMove = (currentBoard: BoardType): void => {
     let availableMoves = currentBoard
       .map((value, index) => (value === null ? index : null))
-      .filter((value) => value !== null);
+      .filter((value): value is number => value !== null);
     if (availableMoves.length === 0) return;
 
     const botIndex =
       availableMoves[Math.floor(Math.random() * availableMoves.length)];
-    const newBoard = [...currentBoard];
+    const newBoard: BoardType = [...currentBoard];
     newBoard[botIndex] = "O";
     setBoard(newBoard);
 
@@ -95,7 +97,7 @@ const TicTacToe = () => {
     }
   };
 
-  const calculateWinner = (squares: string[]) => {
+  const calculateWinner = (squares: BoardType): string | null => {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -119,7 +121,7 @@ const TicTacToe = () => {
     return null;
   };
 
-  const resetBoard = () => {
+  const resetBoard = (): void => {
     setBoard(Array(9).fill(null));
     setIsXNext(true);
     setIsDraw(false);
@@ -127,7 +129,7 @@ const TicTacToe = () => {
     setCountdown(6);
   };
 
-  const resetGame = () => {
+  const resetGame = (): void => {
     // Reset state variables
     setBoard(Array(9).fill(null));
     setXScore(0);
