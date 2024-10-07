@@ -27,19 +27,17 @@ const TicTacToe: React.FC = () => {
     setCountdown,
   } = useGameStore();
 
-  const [isXNext, setIsXNext] = useState<boolean>(true);
+  // const [isXNext, setIsXNext] = useState<boolean>(true);
   const [winnerMessage, setWinnerMessage] = useState<string>("");
   const [oWinStreak, setOWinStreak] = useState<number>(0);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (countdown > 0 && (winnerMessage || isDraw)) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-    } else if (countdown === 0) {
-      resetBoard();
-    }
-    return () => clearTimeout(timer);
-  }, [countdown, winnerMessage, isDraw]);
+  const resetBoard = (): void => {
+    setBoard(Array(9).fill(null));
+    // setIsXNext(true);
+    setIsDraw(false);
+    setWinnerMessage("");
+    setCountdown(6);
+  };
 
   const handleClick = (index: number): void => {
     if (board[index] || calculateWinner(board)) return;
@@ -71,7 +69,7 @@ const TicTacToe: React.FC = () => {
   };
 
   const botMove = (currentBoard: BoardType): void => {
-    let availableMoves = currentBoard
+    const availableMoves = currentBoard
       .map((value, index) => (value === null ? index : null))
       .filter((value): value is number => value !== null);
     if (availableMoves.length === 0) return;
@@ -128,27 +126,28 @@ const TicTacToe: React.FC = () => {
     return null;
   };
 
-  const resetBoard = (): void => {
-    setBoard(Array(9).fill(null));
-    setIsXNext(true);
-    setIsDraw(false);
-    setWinnerMessage("");
-    setCountdown(6);
-  };
-
   const resetGame = (): void => {
     setBoard(Array(9).fill(null));
     setXScore(0);
     setOScore(0);
     setXWins(0);
     setOWins(0);
-    setIsXNext(true);
+    // setIsXNext(true);
     setIsDraw(false);
     setWinnerMessage("");
     setCountdown(6);
     localStorage.clear();
   };
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0 && (winnerMessage || isDraw)) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else if (countdown === 0) {
+      resetBoard();
+    }
+    return () => clearTimeout(timer);
+  }, [countdown, winnerMessage, isDraw, resetBoard, setCountdown]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
